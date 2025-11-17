@@ -1,5 +1,6 @@
 ﻿using GProject.Application.Repository;
-using GProject.Domain.Entities;
+using GProject.Domain.Entities.Auth;
+using GProject.Domain.Entities.Database;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GProject.Controllers;
@@ -15,13 +16,31 @@ public class AuthController : ControllerBase
         _userRepository = userRepository;
     }
 
-    [HttpPost]
-    public IActionResult SignUp()
+    [HttpPost("signup")]
+    public ActionResult SignUp([FromBody] User user)
     {
-        throw new NotImplementedException();
+        var createdUser = _userRepository.Add(user);
+
+        if (createdUser is null)
+            return BadRequest(user);
+
+        return Ok(user);
     }
 
-    [HttpGet]
+    [HttpPost("signin")]
+    public ActionResult SignIn([FromBody]AuthData credentials)
+    {
+        var searchedUser = _userRepository.GetByUsername(credentials.Username);
+        if (searchedUser is null)
+            return NotFound();
+
+        if (credentials.Password != searchedUser.Password)
+            return Unauthorized();
+
+        return Ok(searchedUser);
+    }
+
+    [HttpGet("all")]
     public ActionResult<List<User>> GetAll()
     {
         var users = _userRepository.GetAll();

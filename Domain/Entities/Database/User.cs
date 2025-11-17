@@ -1,4 +1,4 @@
-﻿namespace GProject.Domain.Entities;
+﻿namespace GProject.Domain.Entities.Database;
 
 public class User
 {
