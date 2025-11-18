@@ -8,7 +8,7 @@ public class UserRepository(ApplicationContext context) : IUserRepository
 {
     private readonly ApplicationContext _context = context;
 
-    public User Add(User entity)
+    public User? Add(User entity)
     {
         _context.Users.Add(entity);
         _context.SaveChanges();

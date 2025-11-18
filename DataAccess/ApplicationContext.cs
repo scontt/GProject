@@ -27,6 +27,7 @@ namespace GProject.DataAccess
             modelBuilder.Entity<User>().HasKey(u => u.Id);
             modelBuilder.Entity<Genre>().HasKey(g => g.Id);
             modelBuilder.Entity<Game>().HasKey(g => g.Id);
+            modelBuilder.Entity<GamesList>().HasKey(g => g.Id);
 
             modelBuilder.Entity<Game>()
                 .HasOne(x => x.GameGenre)
@@ -36,6 +37,11 @@ namespace GProject.DataAccess
             modelBuilder.Entity<Game>()
                 .HasMany(x => x.Lists)
                 .WithMany(x => x.Games);
+
+            modelBuilder.Entity<GamesList>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.GameLists)
+                .HasForeignKey(x => x.CreatorId);
         }
     }
 }

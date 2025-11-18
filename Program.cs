@@ -1,5 +1,6 @@
 
 using GProject.DataAccess;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace GProject
@@ -16,6 +17,8 @@ namespace GProject
             builder.Services.AddOpenApi();
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            builder.Services.AddMapster();
 
             builder.Services.AddDbContext<ApplicationContext>(options =>
                 options.UseNpgsql(connectionString));

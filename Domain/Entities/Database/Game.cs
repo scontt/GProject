@@ -1,6 +1,9 @@
-﻿namespace GProject.Domain.Entities.Database;
+﻿using GProject.Domain.Dto;
+using Mapster;
 
-public class Game
+namespace GProject.Domain.Entities.Database;
+
+public class Game : IMapFrom<GameDto>
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;

@@ -1,11 +1,9 @@
-﻿namespace GProject.Domain.Entities.Database;
+﻿namespace GProject.Domain.Dto;
 
-public class GamesList
+public class GamesListDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
     public int CreatorId { get; set; }
-    public List<Game>? Games { get; set; }
-    public User User { get; set; } = null!;
 }

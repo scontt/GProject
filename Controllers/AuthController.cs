@@ -19,12 +19,12 @@ public class AuthController : ControllerBase
     [HttpPost("signup")]
     public ActionResult SignUp([FromBody] User user)
     {
+        if (user is null)
+            return BadRequest(ModelState);
+
         var createdUser = _userRepository.Add(user);
 
-        if (createdUser is null)
-            return BadRequest(user);
-
-        return Ok(user);
+        return Ok(createdUser);
     }
 
     [HttpPost("signin")]
