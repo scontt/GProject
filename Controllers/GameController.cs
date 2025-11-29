@@ -19,7 +19,7 @@ public class GameController(IGameRepository gameRepository) : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public ActionResult GetById(int id)
+    public ActionResult GetById(string id)
     {
         var game = _gameRepository.GetById(id);
 

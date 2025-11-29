@@ -2,8 +2,9 @@
 
 public class User
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Username { get; set; } = null!;
     public string Password { get; set; } = null!;
+    public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
     public List<GamesList>? GameLists { get; set; }
 }

@@ -2,7 +2,7 @@
 
 public interface IGetRepository<T>
 {
-    T? GetById(int id);
+    T? GetById(string id);
 
     T? GetByName(string name);
 }

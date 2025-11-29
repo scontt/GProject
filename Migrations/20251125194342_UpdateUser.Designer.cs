@@ -3,6 +3,7 @@ using System;
 using GProject.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GProject.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20251125194342_UpdateUser")]
+    partial class UpdateUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,6 +89,33 @@ namespace GProject.Migrations
                     b.ToTable("Genres");
                 });
 
+            modelBuilder.Entity("GProject.Domain.Entities.Database.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NormalizedName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("GProject.Domain.Entities.Database.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -99,11 +129,16 @@ namespace GProject.Migrations
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("Users");
                 });
@@ -145,6 +180,17 @@ namespace GProject.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("GProject.Domain.Entities.Database.User", b =>
+                {
+                    b.HasOne("GProject.Domain.Entities.Database.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("GameGamesList", b =>
                 {
                     b.HasOne("GProject.Domain.Entities.Database.Game", null)
@@ -163,6 +209,11 @@ namespace GProject.Migrations
             modelBuilder.Entity("GProject.Domain.Entities.Database.Genre", b =>
                 {
                     b.Navigation("Games");
+                });
+
+            modelBuilder.Entity("GProject.Domain.Entities.Database.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("GProject.Domain.Entities.Database.User", b =>

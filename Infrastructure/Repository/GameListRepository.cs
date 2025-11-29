@@ -18,7 +18,7 @@ public class GameListRepository(ApplicationContext context) : IGameListRepositor
 
     public IEnumerable<GamesList> GetAll() => [.. _context.GamesLists];
 
-    public GamesList? GetById(int id) => _context.GamesLists.FirstOrDefault(x => x.Id == id);
+    public GamesList? GetById(string id) => _context.GamesLists.FirstOrDefault(x => x.Id.ToString() == id);
 
     public GamesList? GetByName(string name) => _context.GamesLists.FirstOrDefault(x => x.Name == name);
 }

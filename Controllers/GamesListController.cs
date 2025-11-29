@@ -23,8 +23,8 @@ public class GamesListController(IGameListRepository gameListRepository) : Contr
         return Ok(list);
     }
 
-    [HttpGet("{id:int}")]
-    public ActionResult GetById(int id)
+    [HttpGet("{id}")]
+    public ActionResult GetById(string id)
     {
         var list = _gameListRepository.GetById(id);
 
@@ -34,7 +34,7 @@ public class GamesListController(IGameListRepository gameListRepository) : Contr
         return Ok(list);
     }
 
-    [HttpGet("{name:string}")]
+    [HttpGet("name/{name}")]
     public ActionResult GetByName(string name) 
     {
         var list = _gameListRepository.GetByName(name);

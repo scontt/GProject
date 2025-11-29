@@ -1,49 +1,53 @@
-﻿using GProject.Application.Repository;
+﻿using GProject.Application.Auth;
+using GProject.Application.Repository;
+using GProject.Domain.Dto;
 using GProject.Domain.Entities.Auth;
 using GProject.Domain.Entities.Database;
+using GProject.Infrastructure.Auth;
+using Mapster;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GProject.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(IUserRepository userRepository, IAuthService authService) : ControllerBase
 {
-    private readonly IUserRepository _userRepository;
-
-    public AuthController(IUserRepository userRepository)
-    {
-        _userRepository = userRepository;
-    }
-
     [HttpPost("signup")]
-    public ActionResult SignUp([FromBody] User user)
+    public async Task<IActionResult> SignUp([FromBody] AuthData authData)
     {
-        if (user is null)
+        if (authData is null)
             return BadRequest(ModelState);
 
-        var createdUser = _userRepository.Add(user);
+        var newUser = await authService.RegisterAsync(authData);
 
-        return Ok(createdUser);
+        if (newUser == null)
+            return BadRequest(ModelState);
+
+        return Ok(newUser);
     }
 
     [HttpPost("signin")]
-    public ActionResult SignIn([FromBody]AuthData credentials)
+    public async Task<IActionResult> SignIn([FromBody]AuthData authData)
     {
-        var searchedUser = _userRepository.GetByUsername(credentials.Username);
+        var searchedUser = userRepository.GetByUsername(authData.Username);
+
         if (searchedUser is null)
             return NotFound();
 
-        if (credentials.Password != searchedUser.Password)
+        string? token = await authService.LoginAsync(authData);
+
+        if (string.IsNullOrEmpty(token))
             return Unauthorized();
 
-        return Ok(searchedUser);
+        return Ok(token);
     }
 
     [HttpGet("all")]
     public ActionResult<List<User>> GetAll()
     {
-        var users = _userRepository.GetAll();
+        var users = userRepository.GetAll();
 
         if (users is null)
             return NotFound();
