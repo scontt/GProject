@@ -5,14 +5,14 @@ using GProject.Domain.Entities.Auth;
 using GProject.Domain.Entities.Database;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 namespace GProject.Infrastructure.Auth;
 
-public class AuthService(ApplicationContext context, IConfiguration configuration) : IAuthService
+public class AuthService(ApplicationContext context, IConfiguration configuration, 
+    IOptions<AuthSettings> options, IJwtSigningService jwtService) : IAuthService
 {
     public async Task<UserDto?> RegisterAsync(AuthData authData)
     {
@@ -45,20 +45,18 @@ public class AuthService(ApplicationContext context, IConfiguration configuratio
 
     private string GenerateJwt(User user)
     {
-        var claims = new[]
+        var claims = new List<Claim>()
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+            new("id", user.Id.ToString()),
+            new("username", user.Username)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
         var token = new JwtSecurityToken(
-            issuer: configuration["JwtSettings:Issuer"],
-            audience: configuration["JwtSettings:Audience"],
+            issuer: options.Value.Issuer,
+            audience: options.Value.Audience,
             claims: claims,
-            expires: DateTime.Now.AddHours(1),
-            signingCredentials: creds);
+            expires: DateTime.UtcNow.Add(options.Value.Expires),
+            signingCredentials: jwtService.Credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }

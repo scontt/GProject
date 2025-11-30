@@ -24,6 +24,7 @@ public static class Registrator
     private static IServiceCollection InstallServices(this IServiceCollection services)
     {
         return services
+            .AddSingleton<IJwtSigningService, JwtSigningService>()
             .AddTransient<IAuthService, AuthService>();
     }
 }

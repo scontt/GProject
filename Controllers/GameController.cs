@@ -2,6 +2,7 @@
 using GProject.Domain.Dto;
 using GProject.Domain.Entities.Database;
 using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GProject.Controllers;
@@ -13,6 +14,7 @@ public class GameController(IGameRepository gameRepository) : ControllerBase
     private readonly IGameRepository _gameRepository = gameRepository;
 
     [HttpGet]
+    [Authorize]
     public ActionResult GetAll()
     {
         return Ok(_gameRepository.GetAll());

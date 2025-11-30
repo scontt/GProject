@@ -1,11 +1,7 @@
 ﻿using GProject.Application.Auth;
 using GProject.Application.Repository;
-using GProject.Domain.Dto;
 using GProject.Domain.Entities.Auth;
 using GProject.Domain.Entities.Database;
-using GProject.Infrastructure.Auth;
-using Mapster;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GProject.Controllers;
@@ -14,7 +10,7 @@ namespace GProject.Controllers;
 [Route("api/[controller]")]
 public class AuthController(IUserRepository userRepository, IAuthService authService) : ControllerBase
 {
-    [HttpPost("signup")]
+    [HttpPost("register")]
     public async Task<IActionResult> SignUp([FromBody] AuthData authData)
     {
         if (authData is null)
@@ -28,20 +24,20 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
         return Ok(newUser);
     }
 
-    [HttpPost("signin")]
+    [HttpPost("login")]
     public async Task<IActionResult> SignIn([FromBody]AuthData authData)
     {
         var searchedUser = userRepository.GetByUsername(authData.Username);
 
         if (searchedUser is null)
-            return NotFound();
+            return Unauthorized();
 
         string? token = await authService.LoginAsync(authData);
 
         if (string.IsNullOrEmpty(token))
             return Unauthorized();
 
-        return Ok(token);
+        return Ok($"access: {token}");
     }
 
     [HttpGet("all")]

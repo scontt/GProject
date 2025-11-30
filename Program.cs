@@ -1,6 +1,9 @@
 
+using GProject.Application.Auth;
 using GProject.DataAccess;
 using GProject.Domain.Entities.Database;
+using GProject.Infrastructure.Auth;
+using GProject.Infrastructure.Policies;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -21,37 +24,21 @@ public class Program
 
         builder.Services.AddDbContext<ApplicationContext>(options =>
             options.UseNpgsql(connectionString));
-        /*
-                    builder.Services.AddIdentity<User, Role>(options =>
-                    {
-                        options.Password.RequireDigit = false;
-                        options.Password.RequiredLength = 8;
 
-                    })
-                        .AddEntityFrameworkStores<ApplicationContext>()
-                        .AddDefaultTokenProviders();
+        builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("JwtSettings"));
 
-                    builder.Services.AddOpenIddict()
-                        .AddCore(options => options.UseEntityFrameworkCore().UseDbContext<ApplicationContext>())
-                        .AddServer(options =>
-                        {
-                            options.AllowPasswordFlow()
-                                   .AllowRefreshTokenFlow();
-
-                            options
-                                   .SetAuthorizationEndpointUris("/connect/authorize")
-                                   .SetTokenEndpointUris("/connect/token")
-                                   .SetUserInfoEndpointUris("/connect/userinfo")
-                                   .SetEndSessionEndpointUris("/connect/logout");
-
-                            options.UseAspNetCore()
-                                   .EnableTokenEndpointPassthrough();
-                        })
-                        .AddValidation(options =>
-                        {
-                            options.UseLocalServer();
-                            options.UseAspNetCore();
-                        });*/
+        var cors = builder.Configuration.GetSection("Cors").Get<CorsSettings>() ?? new CorsSettings();
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("Default", policy =>
+            {
+                policy
+                    .WithOrigins(cors.AllowedHosts ?? [])
+                    .WithHeaders(cors.AllowedHeaders ?? [])
+                    .WithMethods(cors.AllowedMethods ?? [])
+                    .AllowCredentials();
+            });
+        });
 
         builder.Services.AddAuthentication(options =>
         {
@@ -60,15 +47,19 @@ public class Program
             options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
           {
-              options.TokenValidationParameters = new TokenValidationParameters()
+              var jwt = builder.Services.BuildServiceProvider().GetRequiredService<IJwtSigningService>();
+
+              options.TokenValidationParameters = new TokenValidationParameters
               {
-                  ValidIssuer = config["JwtSetting:Issuer"],
-                  ValidAudience = config["JwtSetting:Audience"],
-                  IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:Key"]!)),
                   ValidateIssuer = true,
                   ValidateAudience = true,
                   ValidateLifetime = true,
                   ValidateIssuerSigningKey = true,
+
+                  ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+                  ValidAudience = builder.Configuration["JwtSettings:Audience"],
+                  IssuerSigningKeys = jwt.ValidationKeys,
+                  ClockSkew = TimeSpan.FromMinutes(2)
               };
           });
         builder.Services.AddAuthorization();
@@ -89,6 +80,8 @@ public class Program
         {
             app.MapOpenApi();
         }
+
+        app.UseCors("Default");
 
         app.UseHttpsRedirection();
 
