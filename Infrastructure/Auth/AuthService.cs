@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace GProject.Infrastructure.Auth;
 
@@ -60,4 +61,20 @@ public class AuthService(ApplicationContext context, IConfiguration configuratio
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    //private string GenerateRefresh()
+    //{
+    //    var randomBytes = new byte[64];
+
+    //    using var randomNumberGenerator = RandomNumberGenerator.Create();
+
+    //    randomNumberGenerator.GetBytes(randomBytes);
+
+    //    var token = Convert.ToBase64String(randomBytes);
+
+    //    //var tokenHash = HashToken(token);
+
+    //    return (token, tokenHash,
+    //        TimeSpan.FromDays(Convert.ToDouble(configuration.GetSection("JwtSettings")["RefreshTokenExpiryInDays"])));
+    //}
 }

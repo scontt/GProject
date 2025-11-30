@@ -16,6 +16,9 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
         if (authData is null)
             return BadRequest(ModelState);
 
+        if (string.IsNullOrEmpty(authData.Username) || string.IsNullOrEmpty(authData.Password))
+            return BadRequest(ModelState);
+
         var newUser = await authService.RegisterAsync(authData);
 
         if (newUser == null)
