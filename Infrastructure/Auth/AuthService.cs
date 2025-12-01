@@ -9,6 +9,9 @@ using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using GProject.Domain.Dto.Auth;
 
 namespace GProject.Infrastructure.Auth;
 
@@ -31,7 +34,7 @@ public class AuthService(ApplicationContext context, IConfiguration configuratio
         return user.Adapt<UserDto>();
     }
 
-    public async Task<string?> LoginAsync(AuthData authData)
+    public async Task<TokenResponse?> LoginAsync(AuthData authData, HttpContext httpContext)
     {
         if (authData == null) return null;
 
@@ -41,7 +44,27 @@ public class AuthService(ApplicationContext context, IConfiguration configuratio
         if (!BCrypt.Net.BCrypt.Verify(authData.Password, searchedUser.Password))
             return null;
 
-        return GenerateJwt(searchedUser);
+        var accessToken = GenerateJwt(searchedUser);
+
+        var (refreshPlain, refreshHash, expiresAt) = GenerateRefresh(configuration);
+
+        var refreshEntity = new RefreshToken
+        {
+            UserId = searchedUser.Id,
+            TokenHash = refreshHash,
+            ExpiresAt = expiresAt,
+            CreatedAt = DateTime.UtcNow,
+            IsRevoked = false
+        };
+
+        context.RefreshTokens.Add(refreshEntity);
+        await context.SaveChangesAsync();
+
+        return new TokenResponse
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshPlain
+        };
     }
 
     private string GenerateJwt(User user)
@@ -62,19 +85,63 @@ public class AuthService(ApplicationContext context, IConfiguration configuratio
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    //private string GenerateRefresh()
-    //{
-    //    var randomBytes = new byte[64];
+    private (string PlainToken, string TokenHash, DateTime ExpiresAt) GenerateRefresh(IConfiguration configuration)
+    {
+        var randomBytes = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomBytes);
 
-    //    using var randomNumberGenerator = RandomNumberGenerator.Create();
+        string plain = Base64UrlEncoder.Encode(randomBytes);
+        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(plain));
+        string hash = Convert.ToBase64String(hashBytes);
 
-    //    randomNumberGenerator.GetBytes(randomBytes);
+        int days = 30;
+        var configured = configuration["JwtSettings:RefreshTokenExpiresInDays"];
+        if (int.TryParse(configured, out var parsed) && parsed > 0)
+            days = parsed;
 
-    //    var token = Convert.ToBase64String(randomBytes);
+        var expiresAt = DateTime.UtcNow.AddDays(days);
 
-    //    //var tokenHash = HashToken(token);
+        return (plain, hash, expiresAt);
+    }
 
-    //    return (token, tokenHash,
-    //        TimeSpan.FromDays(Convert.ToDouble(configuration.GetSection("JwtSettings")["RefreshTokenExpiryInDays"])));
-    //}
+    public async Task<TokenResponse?> RefreshAsync(string refreshToken)
+    {
+        if (string.IsNullOrEmpty(refreshToken)) return null;
+
+        // hash incoming token
+        var incomingHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)));
+
+        var dbToken = await context.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == incomingHash);
+        if (dbToken == null || dbToken.IsRevoked || dbToken.ExpiresAt <= DateTime.UtcNow)
+            return null;
+
+        var user = await context.Users.FirstOrDefaultAsync(u => u.Id == dbToken.UserId);
+        if (user == null) return null;
+
+        // Revoke old token and create new one (rotation)
+        dbToken.IsRevoked = true;
+        dbToken.RevokedAt = DateTime.UtcNow;
+
+        var (newPlain, newHash, newExpires) = GenerateRefresh(configuration);
+        var newEntity = new RefreshToken
+        {
+            UserId = user.Id,
+            TokenHash = newHash,
+            ExpiresAt = newExpires,
+            CreatedAt = DateTime.UtcNow,
+            IsRevoked = false
+        };
+
+        context.RefreshTokens.Add(newEntity);
+        await context.SaveChangesAsync();
+
+        var access = GenerateJwt(user);
+
+        return new TokenResponse
+        {
+            AccessToken = access,
+            RefreshToken = newPlain
+        };
+    }
 }

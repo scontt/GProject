@@ -1,7 +1,6 @@
 ﻿using GProject.Application.Auth;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
 using System.Security.Cryptography;
 
 namespace GProject.Infrastructure.Auth;

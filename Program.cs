@@ -1,4 +1,3 @@
-
 using GProject.Application.Auth;
 using GProject.DataAccess;
 using GProject.Domain.Entities.Database;
@@ -28,15 +27,27 @@ public class Program
         builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("JwtSettings"));
 
         var cors = builder.Configuration.GetSection("Cors").Get<CorsSettings>() ?? new CorsSettings();
+
+        var allowedHosts = (cors.AllowedHosts?.Length > 0) ? cors.AllowedHosts : new[] { "http://localhost:3000" };
+        var allowedHeaders = (cors.AllowedHeaders?.Length > 0) ? cors.AllowedHeaders : Array.Empty<string>();
+        var allowedMethods = (cors.AllowedMethods?.Length > 0) ? cors.AllowedMethods : Array.Empty<string>();
+
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("Default", policy =>
             {
-                policy
-                    .WithOrigins(cors.AllowedHosts ?? [])
-                    .WithHeaders(cors.AllowedHeaders ?? [])
-                    .WithMethods(cors.AllowedMethods ?? [])
-                    .AllowCredentials();
+                policy.WithOrigins(allowedHosts)
+                      .AllowCredentials();
+
+                if (allowedHeaders.Length == 0)
+                    policy.AllowAnyHeader();
+                else
+                    policy.WithHeaders(allowedHeaders);
+
+                if (allowedMethods.Length == 0)
+                    policy.AllowAnyMethod();
+                else
+                    policy.WithMethods(allowedMethods);
             });
         });
 
@@ -60,6 +71,15 @@ public class Program
                   ValidAudience = builder.Configuration["JwtSettings:Audience"],
                   IssuerSigningKeys = jwt.ValidationKeys,
                   ClockSkew = TimeSpan.FromMinutes(2)
+              };
+
+              options.Events = new JwtBearerEvents
+              {
+                  OnMessageReceived = context =>
+                  {
+                      context.Token = context.Request.Cookies["ahaha"];
+                      return Task.CompletedTask;
+                  }
               };
           });
         builder.Services.AddAuthorization();

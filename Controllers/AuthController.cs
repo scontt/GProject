@@ -1,5 +1,7 @@
 ﻿using GProject.Application.Auth;
 using GProject.Application.Repository;
+using GProject.Domain.Dto;
+using GProject.Domain.Dto.Auth;
 using GProject.Domain.Entities.Auth;
 using GProject.Domain.Entities.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -28,19 +30,44 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> SignIn([FromBody]AuthData authData)
+    public async Task<IActionResult> SignIn([FromBody] AuthData authData)
     {
         var searchedUser = userRepository.GetByUsername(authData.Username);
 
         if (searchedUser is null)
             return Unauthorized();
 
-        string? token = await authService.LoginAsync(authData);
+        TokenResponse? tokens = await authService.LoginAsync(authData, HttpContext);
 
-        if (string.IsNullOrEmpty(token))
+        if (tokens is null)
             return Unauthorized();
 
-        return Ok($"access: {token}");
+        var cookieOptions = new CookieOptions()
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddDays(30),
+            Path = "/",
+        };
+
+        Response.Cookies.Append("ahaha", tokens.AccessToken, cookieOptions);
+
+        return Ok(new { accessToken = tokens.AccessToken });
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
+    {
+        if (request is null || string.IsNullOrEmpty(request.RefreshToken))
+            return BadRequest();
+
+        var tokens = await authService.RefreshAsync(request.RefreshToken);
+
+        if (tokens is null)
+            return Unauthorized();
+
+        return Ok(tokens);
     }
 
     [HttpGet("all")]
