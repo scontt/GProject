@@ -20,4 +20,8 @@ public class UserRepository(ApplicationContext context) : IUserRepository
     public User? GetByUsername(string username) => _context.Users.FirstOrDefault(x => x.Username == username);
 
     public IEnumerable<User> GetAll() => [.. _context.Users];
+
+    public User? GetById(string id) => _context.Users.FirstOrDefault(x => x.Id.ToString() == id);
+
+    public User? GetByName(string name) => _context.Users.FirstOrDefault(x => x.Username == name);
 }

@@ -37,17 +37,9 @@ public class Program
             options.AddPolicy("Default", policy =>
             {
                 policy.WithOrigins(allowedHosts)
-                      .AllowCredentials();
-
-                if (allowedHeaders.Length == 0)
-                    policy.AllowAnyHeader();
-                else
-                    policy.WithHeaders(allowedHeaders);
-
-                if (allowedMethods.Length == 0)
-                    policy.AllowAnyMethod();
-                else
-                    policy.WithMethods(allowedMethods);
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
             });
         });
 

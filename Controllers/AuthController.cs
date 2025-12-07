@@ -4,7 +4,9 @@ using GProject.Domain.Dto;
 using GProject.Domain.Dto.Auth;
 using GProject.Domain.Entities.Auth;
 using GProject.Domain.Entities.Database;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace GProject.Controllers;
 
@@ -56,6 +58,15 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
         return Ok(new { accessToken = tokens.AccessToken });
     }
 
+
+    [Authorize]
+    [HttpGet("check")]
+    public async Task<IActionResult> Check()
+    {
+        var userId = User.FindFirstValue("id");
+        return Ok(userId);
+    }
+
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
     {
@@ -68,16 +79,5 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
             return Unauthorized();
 
         return Ok(tokens);
-    }
-
-    [HttpGet("all")]
-    public ActionResult<List<User>> GetAll()
-    {
-        var users = userRepository.GetAll();
-
-        if (users is null)
-            return NotFound();
-
-        return Ok(users);
     }
 }
