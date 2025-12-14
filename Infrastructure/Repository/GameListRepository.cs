@@ -8,17 +8,22 @@ public class GameListRepository(ApplicationContext context) : IGameListRepositor
 {
     private readonly ApplicationContext _context = context;
 
-    public GamesList? Add(GamesList entity)
+    public GameList? Add(GameList entity)
     {
-        if (entity is not null)
-            _context.GamesLists.Add(entity);
+        if (entity is null)
+            return null;
+
+        entity.User = _context.Users.First(x => x.Id == entity.CreatorId);
+        _context.GamesLists.Add(entity);
 
         return entity;
     }
 
-    public IEnumerable<GamesList> GetAll() => [.. _context.GamesLists];
+    public IEnumerable<GameList> GetAll() => [.. _context.GamesLists];
 
-    public GamesList? GetById(string id) => _context.GamesLists.FirstOrDefault(x => x.Id.ToString() == id);
+    public GameList? GetById(string id) => _context.GamesLists.FirstOrDefault(x => x.Id.ToString() == id);
 
-    public GamesList? GetByName(string name) => _context.GamesLists.FirstOrDefault(x => x.Name == name);
+    public GameList? GetByName(string name) => _context.GamesLists.FirstOrDefault(x => x.Name == name);
+
+    public IEnumerable<GameList> GetByUserId(string userId) => _context.GamesLists.Where(x => x.CreatorId.ToString() == userId);
 }

@@ -8,7 +8,7 @@ namespace GProject.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class GamesListController(IGameListRepository gameListRepository) : ControllerBase
+public class GameListsController(IGameListRepository gameListRepository) : ControllerBase
 {
     private readonly IGameListRepository _gameListRepository = gameListRepository;
 
@@ -42,16 +42,27 @@ public class GamesListController(IGameListRepository gameListRepository) : Contr
         if (list is null)
             return NotFound();
 
-        return Ok(list.Adapt<GamesListDto>());
+        return Ok(list.Adapt<GameListDto>());
+    }
+
+    [HttpGet("user/{userId}")]
+    public IActionResult GetByUserId(string userId)
+    {
+        var list = _gameListRepository.GetByUserId(userId);
+
+        if (list is null || list.Count() == 0)
+            return NotFound();
+
+        return Ok(list.Adapt<GameListDto>());
     }
 
     [HttpPost]
-    public ActionResult Add([FromBody] GamesListDto list)
+    public ActionResult Create([FromBody] GameListDto list)
     {
         if (list is null)
             return BadRequest(ModelState);
 
-        var newList = _gameListRepository.Add(list.Adapt<GamesList>());
+        var newList = _gameListRepository.Add(list.Adapt<GameList>());
 
         return Ok(newList);
     }

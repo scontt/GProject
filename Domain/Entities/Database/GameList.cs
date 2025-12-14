@@ -1,6 +1,6 @@
 ﻿namespace GProject.Domain.Entities.Database;
 
-public class GamesList
+public class GameList
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;

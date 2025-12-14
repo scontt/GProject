@@ -3,7 +3,7 @@ using GProject.Domain.Entities.Database;
 
 namespace GProject.Application.Repository;
 
-public interface IUserRepository : IRepository<User>, IGetRepository<User>
+public interface IUserRepository : IRepository<User>, IReadRepository<User>
 {
     User? GetByUsername(string username);
 }

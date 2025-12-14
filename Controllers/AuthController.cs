@@ -1,9 +1,7 @@
 ﻿using GProject.Application.Auth;
 using GProject.Application.Repository;
-using GProject.Domain.Dto;
 using GProject.Domain.Dto.Auth;
 using GProject.Domain.Entities.Auth;
-using GProject.Domain.Entities.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -56,6 +54,14 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
         Response.Cookies.Append("ahaha", tokens.AccessToken, cookieOptions);
 
         return Ok(new { accessToken = tokens.AccessToken });
+    }
+
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        Response.Cookies.Delete("ahaha");
+
+        return Ok();
     }
 
 

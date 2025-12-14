@@ -1,6 +1,6 @@
 ﻿namespace GProject.Application.Repository.Base;
 
-public interface IGetRepository<T>
+public interface IReadRepository<T>
 {
     T? GetById(string id);
 
