@@ -23,7 +23,7 @@ public class GameListRepository(ApplicationContext context) : IGameListRepositor
 
     public GameList? GetById(string id) => _context.GamesLists.FirstOrDefault(x => x.Id.ToString() == id);
 
-    public GameList? GetByName(string name) => _context.GamesLists.FirstOrDefault(x => x.Name == name);
+    public IEnumerable<GameList>? GetByName(string name) => _context.GamesLists.Where(x => x.Name == name);
 
     public IEnumerable<GameList> GetByUserId(string userId) => _context.GamesLists.Where(x => x.CreatorId.ToString() == userId);
 }

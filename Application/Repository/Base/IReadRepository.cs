@@ -4,5 +4,5 @@ public interface IReadRepository<T>
 {
     T? GetById(string id);
 
-    T? GetByName(string name);
+    IEnumerable<T>? GetByName(string name);
 }

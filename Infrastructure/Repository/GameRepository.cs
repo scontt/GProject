@@ -19,9 +19,12 @@ public class GameRepository(ApplicationContext context) : IGameRepository
         return entity;
     }
 
-    public IEnumerable<Game> GetAll() => [.. _context.Games];
+    public IEnumerable<Game> GetAll() => 
+        [.. _context.Games];
 
-    public Game? GetById(string id) => _context.Games.FirstOrDefault(x => x.Id.ToString() == id);
+    public Game? GetById(string id) => 
+        _context.Games.FirstOrDefault(x => x.Id.ToString() == id);
 
-    public Game? GetByName(string name) => _context.Games.FirstOrDefault(x => x.Name == name);
+    public IEnumerable<Game>? GetByName(string name) => 
+        _context.Games.Where(x => x.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
 }

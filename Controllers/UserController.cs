@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GProject.Controllers;
 
 [Authorize]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class UserController(IUserRepository userRepository) : ControllerBase
 {
     [HttpGet("me")]

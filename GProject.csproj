@@ -20,10 +20,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
     <PackageReference Include="OpenIddict.AspNetCore" Version="7.2.0" />
     <PackageReference Include="OpenIddict.EntityFramework" Version="7.2.0" />
     <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="7.2.0" />
+    <PackageReference Include="RestSharp" Version="113.0.0" />
   </ItemGroup>
 
 </Project>

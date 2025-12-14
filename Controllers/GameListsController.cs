@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GProject.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class GameListsController(IGameListRepository gameListRepository) : ControllerBase
 {
     private readonly IGameListRepository _gameListRepository = gameListRepository;

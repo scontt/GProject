@@ -23,5 +23,5 @@ public class UserRepository(ApplicationContext context) : IUserRepository
 
     public User? GetById(string id) => _context.Users.FirstOrDefault(x => x.Id.ToString() == id);
 
-    public User? GetByName(string name) => _context.Users.FirstOrDefault(x => x.Username == name);
+    public IEnumerable<User>? GetByName(string name) => _context.Users.Where(x => x.Username == name);
 }

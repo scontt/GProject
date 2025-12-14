@@ -8,14 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace GProject.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class GameController(IGameRepository gameRepository) : ControllerBase
 {
     private readonly IGameRepository _gameRepository = gameRepository;
 
-    [HttpGet]
     [Authorize]
-    public ActionResult GetAll()
+    [HttpGet("steam")]
+    public ActionResult GetAllFromSteam()
     {
         return Ok(_gameRepository.GetAll());
     }
@@ -31,14 +31,14 @@ public class GameController(IGameRepository gameRepository) : ControllerBase
         return Ok(game.Adapt<GameDto>());
     }
 
-    [HttpPost]
-    public ActionResult Add([FromBody] GameDto game)
+    [HttpGet("name/{name}")]
+    public ActionResult GetByName(string name)
     {
-        if (game == null) return BadRequest(ModelState);
+        var game = _gameRepository.GetByName(name);
 
-        var createGame = game.Adapt<Game>();
-        _gameRepository.Add(createGame);
+        if (game == null)
+            return NotFound();
 
-        return Ok();
+        return Ok(game.Adapt<GameDto>());
     }
 }

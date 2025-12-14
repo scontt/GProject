@@ -9,7 +9,7 @@ using System.Security.Claims;
 namespace GProject.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class AuthController(IUserRepository userRepository, IAuthService authService) : ControllerBase
 {
     [HttpPost("register")]
