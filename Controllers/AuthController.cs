@@ -50,7 +50,7 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
         {
             HttpOnly = true,
             Secure = true,
-            SameSite = SameSiteMode.Lax,
+            SameSite = SameSiteMode.None,
             Expires = DateTimeOffset.UtcNow.AddDays(30),
             Path = "/",
         };

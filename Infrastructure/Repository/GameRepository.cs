@@ -26,5 +26,5 @@ public class GameRepository(ApplicationContext context) : IGameRepository
         _context.Games.FirstOrDefault(x => x.Id.ToString() == id);
 
     public IEnumerable<Game>? GetByName(string name) => 
-        _context.Games.Where(x => x.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
+        _context.Games.Where(g => g.Name.ToLower().Contains(name.ToLower()));
 }

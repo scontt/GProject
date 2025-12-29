@@ -1,6 +1,7 @@
 ﻿using GProject.Application.Auth;
 using GProject.Application.Repository;
 using GProject.Infrastructure.Auth;
+using GProject.Infrastructure.Extra;
 using GProject.Infrastructure.Repository;
 
 namespace GProject;
@@ -25,6 +26,7 @@ public static class Registrator
     {
         return services
             .AddSingleton<IJwtSigningService, JwtSigningService>()
-            .AddTransient<IAuthService, AuthService>();
+            .AddTransient<IAuthService, AuthService>()
+            .AddHostedService<SteamUpdateService>();
     }
 }

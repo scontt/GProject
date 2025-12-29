@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GProject.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20251201165237_refresh token")]
-    partial class refreshtoken
+    [Migration("20251223202608_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,14 +57,16 @@ namespace GProject.Migrations
 
             modelBuilder.Entity("GProject.Domain.Entities.Database.Game", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("GenreId")
+                    b.Property<Guid?>("GenreId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -78,7 +80,7 @@ namespace GProject.Migrations
                     b.ToTable("Games");
                 });
 
-            modelBuilder.Entity("GProject.Domain.Entities.Database.GamesList", b =>
+            modelBuilder.Entity("GProject.Domain.Entities.Database.GameList", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,10 +143,10 @@ namespace GProject.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GameGamesList", b =>
+            modelBuilder.Entity("GameGameList", b =>
                 {
-                    b.Property<Guid>("GamesId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("GamesId")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("ListsId")
                         .HasColumnType("uuid");
@@ -153,21 +155,19 @@ namespace GProject.Migrations
 
                     b.HasIndex("ListsId");
 
-                    b.ToTable("GameGamesList");
+                    b.ToTable("GameGameList");
                 });
 
             modelBuilder.Entity("GProject.Domain.Entities.Database.Game", b =>
                 {
                     b.HasOne("GProject.Domain.Entities.Database.Genre", "GameGenre")
                         .WithMany("Games")
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GenreId");
 
                     b.Navigation("GameGenre");
                 });
 
-            modelBuilder.Entity("GProject.Domain.Entities.Database.GamesList", b =>
+            modelBuilder.Entity("GProject.Domain.Entities.Database.GameList", b =>
                 {
                     b.HasOne("GProject.Domain.Entities.Database.User", "User")
                         .WithMany("GameLists")
@@ -178,7 +178,7 @@ namespace GProject.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("GameGamesList", b =>
+            modelBuilder.Entity("GameGameList", b =>
                 {
                     b.HasOne("GProject.Domain.Entities.Database.Game", null)
                         .WithMany()
@@ -186,7 +186,7 @@ namespace GProject.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GProject.Domain.Entities.Database.GamesList", null)
+                    b.HasOne("GProject.Domain.Entities.Database.GameList", null)
                         .WithMany()
                         .HasForeignKey("ListsId")
                         .OnDelete(DeleteBehavior.Cascade)

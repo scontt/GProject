@@ -34,11 +34,11 @@ public class GameController(IGameRepository gameRepository) : ControllerBase
     [HttpGet("name/{name}")]
     public ActionResult GetByName(string name)
     {
-        var game = _gameRepository.GetByName(name);
+        var game = _gameRepository.GetByName(name)?.ToList();
 
         if (game == null)
             return NotFound();
 
-        return Ok(game.Adapt<GameDto>());
+        return Ok(game.Adapt<List<GameDto>>());
     }
 }

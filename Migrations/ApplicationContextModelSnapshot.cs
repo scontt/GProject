@@ -54,14 +54,16 @@ namespace GProject.Migrations
 
             modelBuilder.Entity("GProject.Domain.Entities.Database.Game", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("GenreId")
+                    b.Property<Guid?>("GenreId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -140,8 +142,8 @@ namespace GProject.Migrations
 
             modelBuilder.Entity("GameGameList", b =>
                 {
-                    b.Property<Guid>("GamesId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("GamesId")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("ListsId")
                         .HasColumnType("uuid");
@@ -157,9 +159,7 @@ namespace GProject.Migrations
                 {
                     b.HasOne("GProject.Domain.Entities.Database.Genre", "GameGenre")
                         .WithMany("Games")
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GenreId");
 
                     b.Navigation("GameGenre");
                 });
