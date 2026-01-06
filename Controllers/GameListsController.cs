@@ -56,6 +56,7 @@ public class GameListsController(IGameListRepository gameListRepository) : Contr
         return Ok(list.Adapt<GameListDto>());
     }
 
+
     [HttpPost]
     public ActionResult Create([FromBody] GameListDto list)
     {
