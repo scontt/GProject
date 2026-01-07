@@ -46,7 +46,7 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
         if (tokens is null)
             return Unauthorized();
 
-        var cookieOptions = new CookieOptions()
+        var refreshCookieOptions = new CookieOptions()
         {
             HttpOnly = true,
             Secure = true,
@@ -55,9 +55,9 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
             Path = "/",
         };
 
-        Response.Cookies.Append("ahaha", tokens.AccessToken, cookieOptions);
+        Response.Cookies.Append("sosat", tokens.RefreshToken, refreshCookieOptions);
 
-        return Ok(new { accessToken = tokens.AccessToken });
+        return Ok(new { accessToken = tokens.AccessToken, refreshToken = tokens.RefreshToken });
     }
 
     [HttpPost("logout")]

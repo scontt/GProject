@@ -1,7 +1,9 @@
-﻿using GProject.Application.Repository;
+﻿using System.Security.Claims;
+using GProject.Application.Repository;
 using GProject.Domain.Dto;
 using GProject.Domain.Entities.Database;
 using Mapster;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GProject.Controllers;
@@ -58,11 +60,14 @@ public class GameListsController(IGameListRepository gameListRepository) : Contr
 
 
     [HttpPost]
+    [Authorize]
     public ActionResult Create([FromBody] GameListDto list)
     {
         if (list is null)
             return BadRequest(ModelState);
 
+        var currentUserId = User.FindFirstValue("id");
+        list.Id = new(currentUserId!);
         var newList = _gameListRepository.Add(list.Adapt<GameList>());
 
         return Ok(newList);

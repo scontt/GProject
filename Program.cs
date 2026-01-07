@@ -64,15 +64,6 @@ public class Program
                   IssuerSigningKeys = jwt.ValidationKeys,
                   ClockSkew = TimeSpan.FromMinutes(2)
               };
-
-              options.Events = new JwtBearerEvents
-              {
-                  OnMessageReceived = context =>
-                  {
-                      context.Token = context.Request.Cookies["ahaha"];
-                      return Task.CompletedTask;
-                  }
-              };
           });
         builder.Services.AddAuthorization();
 

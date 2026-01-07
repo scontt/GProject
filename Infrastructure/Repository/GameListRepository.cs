@@ -13,8 +13,8 @@ public class GameListRepository(ApplicationContext context) : IGameListRepositor
         if (entity is null)
             return null;
 
-        entity.User = _context.Users.First(x => x.Id == entity.CreatorId);
         _context.GamesLists.Add(entity);
+        _context.SaveChanges();
 
         return entity;
     }
