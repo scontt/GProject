@@ -38,7 +38,8 @@ namespace GProject.DataAccess
 
             modelBuilder.Entity<Game>()
                 .HasMany(x => x.Lists)
-                .WithMany(x => x.Games);
+                .WithMany(x => x.Games)
+                .UsingEntity(j => j.ToTable("GamesGameLists"));
 
             modelBuilder.Entity<GameList>()
                 .HasOne(x => x.User)

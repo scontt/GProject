@@ -1,4 +1,5 @@
-﻿using GProject.Application.Repository;
+﻿using System.Data.Entity;
+using GProject.Application.Repository;
 using GProject.DataAccess;
 using GProject.Domain.Entities.Database;
 
@@ -19,11 +20,49 @@ public class GameListRepository(ApplicationContext context) : IGameListRepositor
         return entity;
     }
 
+    public bool AddGame(string listId, int gameId)
+    {
+        var list = GetById(listId);
+        var game = _context.Games.FirstOrDefault(g => g.Id == gameId);
+        if (list is null || game is null)
+            return false;
+
+        list.Games ??= [];
+        list.Games.Add(game);
+
+        int rows = _context.SaveChanges();
+
+        return rows > 0;
+    }
+
+    public bool RemoveGame(string listId, int gameId)
+    {
+        var list = GetById(listId);
+        var game = _context.Games.FirstOrDefault(g => g.Id == gameId);
+        if (list is null || game is null)
+            return false;
+
+        list.Games ??= [];
+        list.Games.Remove(game);
+
+        int rows = _context.SaveChanges();
+
+        return rows > 0;
+    }
+
     public IEnumerable<GameList> GetAll() => [.. _context.GamesLists];
 
-    public GameList? GetById(string id) => _context.GamesLists.FirstOrDefault(x => x.Id.ToString() == id);
+    public GameList? GetById(string id)
+    {
+        var guidId = Guid.Parse(id);
+        var gameList = _context.GamesLists.FirstOrDefault(gl => gl.Id == guidId);
+        _context.Entry(gameList).Collection(gl => gl.Games).Load();
+
+        return gameList;
+    }
+    
 
     public IEnumerable<GameList>? GetByName(string name) => _context.GamesLists.Where(x => x.Name == name);
 
-    public IEnumerable<GameList> GetByUserId(string userId) => _context.GamesLists.Where(x => x.CreatorId.ToString() == userId);
+    public IEnumerable<GameList> GetByUserId(Guid userId) => _context.GamesLists.Where(x => x.CreatorId == userId);
 }

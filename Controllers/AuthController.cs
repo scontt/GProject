@@ -57,7 +57,7 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
 
         Response.Cookies.Append("sosat", tokens.RefreshToken, refreshCookieOptions);
 
-        return Ok(new { accessToken = tokens.AccessToken, refreshToken = tokens.RefreshToken });
+        return Ok(new { accessToken = tokens.AccessToken });
     }
 
     [HttpPost("logout")]
@@ -78,16 +78,28 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh([FromBody] RefreshRequest request)
+    public async Task<IActionResult> Refresh()
     {
-        if (request is null || string.IsNullOrEmpty(request.RefreshToken))
+        var refresh = Request.Cookies.First(x => x.Key == "sosat").Value;
+        if (refresh is null || string.IsNullOrEmpty(refresh))
             return BadRequest();
 
-        var tokens = await authService.RefreshAsync(request.RefreshToken);
+        var tokens = await authService.RefreshAsync(refresh);
 
         if (tokens is null)
             return Unauthorized();
 
-        return Ok(tokens);
+        var refreshCookieOptions = new CookieOptions()
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UtcNow.AddDays(30),
+            Path = "/",
+        };
+
+        Response.Cookies.Append("sosat", tokens.RefreshToken, refreshCookieOptions);
+
+        return Ok(tokens.AccessToken);
     }
 }

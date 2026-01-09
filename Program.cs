@@ -1,13 +1,16 @@
 using GProject.Application.Auth;
 using GProject.DataAccess;
+using GProject.Domain.Dto;
 using GProject.Domain.Entities.Database;
 using GProject.Infrastructure.Auth;
 using GProject.Infrastructure.Policies;
+using GProject.Infrastructure.Utility;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Text;
 
 namespace GProject;
@@ -76,6 +79,8 @@ public class Program
 
         builder.Services.AddServices(builder.Configuration);
 
+        TypeAdapterConfig.GlobalSettings.Scan(typeof(MapsterConfig).Assembly);
+        
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
