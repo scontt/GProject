@@ -144,4 +144,19 @@ public class AuthService(ApplicationContext context, IConfiguration configuratio
             RefreshToken = newPlain
         };
     }
+
+    public async Task<bool> RevokeRefreshAsync(string refreshToken)
+    {
+        if (string.IsNullOrEmpty(refreshToken)) return false;
+
+        var incomingHash = Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)));
+        var dbToken = await context.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == incomingHash);
+        if (dbToken == null || dbToken.IsRevoked) return false;
+
+        dbToken.IsRevoked = true;
+        dbToken.RevokedAt = DateTime.UtcNow;
+        await context.SaveChangesAsync();
+
+        return true;
+    }
 }

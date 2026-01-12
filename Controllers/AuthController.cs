@@ -63,7 +63,19 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
-        Response.Cookies.Delete("ahaha");
+        if (Request.Cookies.TryGetValue("sosat", out var refreshToken))
+            await authService.RevokeRefreshAsync(refreshToken);
+
+        var deleteOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Expires = DateTimeOffset.UnixEpoch,
+            Path = "/",
+        };
+
+        Response.Cookies.Delete("sosat", deleteOptions);
 
         return Ok();
     }
