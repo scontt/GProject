@@ -77,6 +77,18 @@ public class GameListsController(IGameListRepository gameListRepository, IGameRe
         }
     }
 
+    [HttpPatch]
+    public IActionResult PatchList([FromBody] GameListDto listDto)
+    {
+        if (listDto is null)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var list = gameListRepository.EditList(listDto.Adapt<GameList>());
+        return Ok(list);
+    }
+
     [HttpPatch("removegame")]
     public IActionResult RemoveGame([FromBody] GamePatch body)
     {

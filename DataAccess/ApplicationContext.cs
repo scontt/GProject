@@ -12,10 +12,12 @@ namespace GProject.DataAccess
         public DbSet<GameList> GamesLists { get; set; } = null!;
         public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
-        private readonly string _connectionString = "Host=127.0.0.1;Password=hitler7;Persist Security Info=True;Username=postgres;Database=gproject";
+        private readonly string _connectionString;
 
-        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
+        public ApplicationContext(DbContextOptions<ApplicationContext> options, IConfiguration configuration) : base(options)
         {
+            _connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -2,6 +2,7 @@
 using GProject.Application.Repository;
 using GProject.DataAccess;
 using GProject.Domain.Entities.Database;
+using Mapster;
 
 namespace GProject.Infrastructure.Repository;
 
@@ -50,7 +51,12 @@ public class GameListRepository(ApplicationContext context) : IGameListRepositor
         return rows > 0;
     }
 
-    public IEnumerable<GameList> GetAll() => [.. _context.GamesLists];
+    public IEnumerable<GameList> GetAll()
+    {
+        var lists = _context.GamesLists.ToList();
+
+        return lists;
+    }
 
     public GameList? GetById(string id)
     {
@@ -60,9 +66,35 @@ public class GameListRepository(ApplicationContext context) : IGameListRepositor
 
         return gameList;
     }
-    
+
+    public GameList? EditList(GameList updatedList)
+    {
+        var existing = _context.GamesLists
+            .Include(gl => gl.Games)
+            .FirstOrDefault(gl => gl.Id == updatedList.Id);
+
+        if (existing is null)
+            return null;
+
+        existing.Name = updatedList.Name;
+        existing.Description = updatedList.Description;
+
+        _context.SaveChanges();
+
+        return existing;
+    }
 
     public IEnumerable<GameList>? GetByName(string name) => _context.GamesLists.Where(x => x.Name == name);
 
-    public IEnumerable<GameList> GetByUserId(Guid userId) => _context.GamesLists.Where(x => x.CreatorId == userId);
+    public ICollection<GameList> GetByUserId(Guid userId)
+    {
+        var lists = _context.GamesLists.Where(x => x.CreatorId == userId).ToList();
+
+        foreach (var item in lists)
+        {
+            _context.Entry(item).Collection(gl => gl.Games).Load();
+        }
+
+        return lists;
+    }
 }
