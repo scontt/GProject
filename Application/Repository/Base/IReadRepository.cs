@@ -2,7 +2,7 @@
 
 public interface IReadRepository<T>
 {
-    T? GetById(string id);
+    Task<T?> GetById(string id);
 
-    IEnumerable<T>? GetByName(string name);
+    Task<IEnumerable<T>?> GetByName(string name);
 }

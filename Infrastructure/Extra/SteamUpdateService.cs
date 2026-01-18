@@ -18,6 +18,9 @@ public class SteamUpdateService : BackgroundService
     private readonly List<App> apps = [];
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await GetSteamStoreGamesAsync();
+        await UpdateDatabaseGames();
+
         PeriodicTimer timer = new(TimeSpan.FromHours(12));
 
         while(await timer.WaitForNextTickAsync())
@@ -33,7 +36,7 @@ public class SteamUpdateService : BackgroundService
         do
         {
             RestClient client = new("https://api.steampowered.com/");
-            RestRequest request = new($"IStoreService/GetAppList/v1?key={key}&max_results=50000&last_appid={lastAppId}");
+            RestRequest request = new($"IStoreService/GetAppList/v1?key={key}&max_results=20");
 
             var response = await client.GetAsync(request);
 
@@ -53,13 +56,13 @@ public class SteamUpdateService : BackgroundService
             var scopedServices = scope.ServiceProvider;
             var gameRepository = scopedServices.GetRequiredService<IGameRepository>();
 
-            List<Game> games = [.. gameRepository.GetAll()];
+            List<Game> games = [.. await gameRepository.GetAllAsync()];
 
             foreach (var item in apps)
             {
                 if (!games.Any(x => x.Name == item.Name))
                 {
-                    gameRepository.Add(new()
+                    await gameRepository.AddAsync(new()
                     {
                         Id = item.AppId,
                         Name = item.Name,

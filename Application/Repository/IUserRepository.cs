@@ -5,5 +5,5 @@ namespace GProject.Application.Repository;
 
 public interface IUserRepository : IRepository<User>, IReadRepository<User>
 {
-    User? GetByUsername(string username);
+    Task<User?> GetByUsername(string username);
 }

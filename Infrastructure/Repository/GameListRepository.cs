@@ -1,4 +1,4 @@
-﻿using System.Data.Entity;
+﻿using Microsoft.EntityFrameworkCore;
 using GProject.Application.Repository;
 using GProject.DataAccess;
 using GProject.Domain.Entities.Database;
@@ -10,68 +10,74 @@ public class GameListRepository(ApplicationContext context) : IGameListRepositor
 {
     private readonly ApplicationContext _context = context;
 
-    public GameList? Add(GameList entity)
+    public async Task<GameList?> AddAsync(GameList entity)
     {
         if (entity is null)
             return null;
 
-        _context.GamesLists.Add(entity);
-        _context.SaveChanges();
+        await _context.GamesLists.AddAsync(entity);
+        await _context.SaveChangesAsync();
 
         return entity;
     }
 
-    public bool AddGame(string listId, int gameId)
+    public async Task<bool> AddGame(string listId, int gameId)
     {
-        var list = GetById(listId);
-        var game = _context.Games.FirstOrDefault(g => g.Id == gameId);
+        var list = await GetById(listId);
+        var game = await _context.Games.FirstOrDefaultAsync(g => g.Id == gameId);
         if (list is null || game is null)
             return false;
 
         list.Games ??= [];
+        if (list.Games.Any(g => g.Id == gameId))
+            return true;
+
         list.Games.Add(game);
 
-        int rows = _context.SaveChanges();
+        int rows = await _context.SaveChangesAsync();
 
         return rows > 0;
     }
 
-    public bool RemoveGame(string listId, int gameId)
+    public async Task<bool> RemoveGame(string listId, int gameId)
     {
-        var list = GetById(listId);
-        var game = _context.Games.FirstOrDefault(g => g.Id == gameId);
+        var list = await GetById(listId);
+        var game = await _context.Games.FirstOrDefaultAsync(g => g.Id == gameId);
         if (list is null || game is null)
             return false;
 
         list.Games ??= [];
         list.Games.Remove(game);
 
-        int rows = _context.SaveChanges();
+        int rows = await _context.SaveChangesAsync();
 
         return rows > 0;
     }
 
-    public IEnumerable<GameList> GetAll()
+    public async Task<IEnumerable<GameList>> GetAllAsync()
     {
-        var lists = _context.GamesLists.ToList();
+        var lists = await _context.GamesLists.ToListAsync();
 
         return lists;
     }
 
-    public GameList? GetById(string id)
+    public async Task<GameList?> GetById(string id)
     {
-        var guidId = Guid.Parse(id);
-        var gameList = _context.GamesLists.FirstOrDefault(gl => gl.Id == guidId);
-        _context.Entry(gameList).Collection(gl => gl.Games).Load();
+        if (!Guid.TryParse(id, out var guidId))
+            return null;
+
+        var gameList = await _context.GamesLists
+            .Include(gl => gl.Games)
+            .FirstOrDefaultAsync(gl => gl.Id == guidId);
 
         return gameList;
     }
 
-    public GameList? EditList(GameList updatedList)
+    public async Task<GameList?> EditList(GameList updatedList)
     {
-        var existing = _context.GamesLists
+        var existing = await _context.GamesLists
             .Include(gl => gl.Games)
-            .FirstOrDefault(gl => gl.Id == updatedList.Id);
+            .FirstOrDefaultAsync(gl => gl.Id == updatedList.Id);
 
         if (existing is null)
             return null;
@@ -79,22 +85,19 @@ public class GameListRepository(ApplicationContext context) : IGameListRepositor
         existing.Name = updatedList.Name;
         existing.Description = updatedList.Description;
 
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
         return existing;
     }
 
-    public IEnumerable<GameList>? GetByName(string name) => _context.GamesLists.Where(x => x.Name == name);
+    public async Task<IEnumerable<GameList>?> GetByName(string name) =>
+        await _context.GamesLists.Where(x => x.Name == name).ToListAsync();
 
-    public ICollection<GameList> GetByUserId(Guid userId)
+    public async Task<ICollection<GameList>> GetByUserId(Guid userId)
     {
-        var lists = _context.GamesLists.Where(x => x.CreatorId == userId).ToList();
-
-        foreach (var item in lists)
-        {
-            _context.Entry(item).Collection(gl => gl.Games).Load();
-        }
-
-        return lists;
+        return await _context.GamesLists
+            .Include(gl => gl.Games)
+            .Where(x => x.CreatorId == userId)
+            .ToListAsync();
     }
 }

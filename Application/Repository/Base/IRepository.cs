@@ -2,7 +2,7 @@
 
 public interface IRepository<T> where T : class
 {
-    IEnumerable<T> GetAll();
+    Task<IEnumerable<T>> GetAllAsync();
 
-    T? Add(T entity);
+    Task<T?> AddAsync(T entity);
 }

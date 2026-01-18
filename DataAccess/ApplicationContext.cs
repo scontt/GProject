@@ -41,7 +41,14 @@ namespace GProject.DataAccess
             modelBuilder.Entity<Game>()
                 .HasMany(x => x.Lists)
                 .WithMany(x => x.Games)
-                .UsingEntity(j => j.ToTable("GamesGameLists"));
+                .UsingEntity<GamesGameList>(
+                l => l.HasOne<GameList>().WithMany().HasForeignKey(x => x.ListId),
+                r => r.HasOne<Game>().WithMany().HasForeignKey(x => x.GameId),
+                j =>
+                {
+                    j.ToTable("GamesGameLists");
+                    j.HasKey(nameof(GamesGameList.GameId), nameof(GamesGameList.ListId));
+                });
 
             modelBuilder.Entity<GameList>()
                 .HasOne(x => x.User)

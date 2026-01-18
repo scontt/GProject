@@ -3,6 +3,7 @@ using System;
 using GProject.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GProject.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20260118110214_mnogokomnogo")]
+    partial class mnogokomnogo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,18 +108,28 @@ namespace GProject.Migrations
 
             modelBuilder.Entity("GProject.Domain.Entities.Database.GamesGameList", b =>
                 {
+                    b.Property<int>("GamesId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ListsId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("GameId")
                         .HasColumnType("integer");
 
                     b.Property<Guid>("ListId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("GameId", "ListId");
+                    b.HasKey("GamesId", "ListsId");
+
+                    b.HasIndex("GameId");
 
                     b.HasIndex("ListId");
+
+                    b.HasIndex("ListsId");
 
                     b.HasIndex("UserId");
 
@@ -182,21 +195,39 @@ namespace GProject.Migrations
 
             modelBuilder.Entity("GProject.Domain.Entities.Database.GamesGameList", b =>
                 {
-                    b.HasOne("GProject.Domain.Entities.Database.Game", null)
+                    b.HasOne("GProject.Domain.Entities.Database.Game", "Game")
                         .WithMany()
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GProject.Domain.Entities.Database.GameList", null)
+                    b.HasOne("GProject.Domain.Entities.Database.Game", null)
+                        .WithMany()
+                        .HasForeignKey("GamesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GProject.Domain.Entities.Database.GameList", "List")
                         .WithMany()
                         .HasForeignKey("ListId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GProject.Domain.Entities.Database.GameList", null)
+                        .WithMany()
+                        .HasForeignKey("ListsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GProject.Domain.Entities.Database.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("List");
 
                     b.Navigation("User");
                 });

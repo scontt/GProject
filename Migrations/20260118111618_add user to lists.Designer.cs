@@ -3,6 +3,7 @@ using System;
 using GProject.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GProject.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20260118111618_add user to lists")]
+    partial class addusertolists
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,18 +108,18 @@ namespace GProject.Migrations
 
             modelBuilder.Entity("GProject.Domain.Entities.Database.GamesGameList", b =>
                 {
-                    b.Property<int>("GameId")
+                    b.Property<int>("GamesId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("ListId")
+                    b.Property<Guid>("ListsId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("GameId", "ListId");
+                    b.HasKey("GamesId", "ListsId");
 
-                    b.HasIndex("ListId");
+                    b.HasIndex("ListsId");
 
                     b.HasIndex("UserId");
 
@@ -184,13 +187,13 @@ namespace GProject.Migrations
                 {
                     b.HasOne("GProject.Domain.Entities.Database.Game", null)
                         .WithMany()
-                        .HasForeignKey("GameId")
+                        .HasForeignKey("GamesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GProject.Domain.Entities.Database.GameList", null)
                         .WithMany()
-                        .HasForeignKey("ListId")
+                        .HasForeignKey("ListsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

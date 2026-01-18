@@ -20,7 +20,8 @@ public static class Registrator
         return services
             .AddScoped<IUserRepository, UserRepository>()
             .AddScoped<IGameRepository, GameRepository>()
-            .AddScoped<IGameListRepository, GameListRepository>();
+            .AddScoped<IGameListRepository, GameListRepository>()
+            .AddScoped<IGamesGameListRepository, GamesGameListRepository>();
     }
 
     private static IServiceCollection InstallServices(this IServiceCollection services)

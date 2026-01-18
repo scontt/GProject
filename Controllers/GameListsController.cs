@@ -2,6 +2,7 @@
 using GProject.Application.Repository;
 using GProject.Domain.Dto;
 using GProject.Domain.Entities.Database;
+using GProject.Infrastructure.Repository;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +12,13 @@ namespace GProject.Controllers;
 [ApiController]
 [Authorize]
 [Route("[controller]")]
-public class GameListsController(IGameListRepository gameListRepository, IGameRepository gameRepository) : ControllerBase
+public class GameListsController(IGameListRepository gameListRepository, IGamesGameListRepository gamesGameListRepository, 
+        IUserRepository userRepository) : ControllerBase
 {
     [HttpGet]
-    public ActionResult GetAll()
+    public async Task<ActionResult> GetAll()
     {
-        var list = gameListRepository.GetAll();
+        var list = await gameListRepository.GetAllAsync();
 
         if (list is null)
             return NotFound();
@@ -25,9 +27,9 @@ public class GameListsController(IGameListRepository gameListRepository, IGameRe
     }
 
     [HttpGet("{id}")]
-    public ActionResult GetById(string id)
+    public async Task<ActionResult> GetById(string id)
     {
-        var list = gameListRepository.GetById(id);
+        var list = await gameListRepository.GetById(id);
 
         if (list is null)
             return NotFound();
@@ -36,9 +38,9 @@ public class GameListsController(IGameListRepository gameListRepository, IGameRe
     }
 
     [HttpGet("name/{name}")]
-    public ActionResult GetByName(string name) 
+    public async Task<ActionResult> GetByName(string name) 
     {
-        var list = gameListRepository.GetByName(name);
+        var list = await gameListRepository.GetByName(name);
 
         if (list is null)
             return NotFound();
@@ -47,9 +49,9 @@ public class GameListsController(IGameListRepository gameListRepository, IGameRe
     }
 
     [HttpGet("user/{userId}")]
-    public IActionResult GetByUserId(string userId)
+    public async Task<IActionResult> GetByUserId(string userId)
     {
-        var list = gameListRepository.GetByUserId(new(userId));
+        var list = await gameListRepository.GetByUserId(new(userId));
 
         if (list is null)
             return NotFound();
@@ -58,14 +60,14 @@ public class GameListsController(IGameListRepository gameListRepository, IGameRe
     }
 
     [HttpPatch("addgame")]
-    public IActionResult AddGame([FromBody] GamePatch body)
+    public async Task<IActionResult> AddGame([FromBody] GamePatch body)
     {
         if (string.IsNullOrEmpty(body.ListId) || string.IsNullOrEmpty(body.GameId))
         {
             return BadRequest(ModelState);
         }
 
-        bool isAdded = gameListRepository.AddGame(body.ListId, Convert.ToInt32(body.GameId));
+        bool isAdded = await gameListRepository.AddGame(body.ListId, Convert.ToInt32(body.GameId));
 
         if (isAdded)
         {
@@ -78,26 +80,44 @@ public class GameListsController(IGameListRepository gameListRepository, IGameRe
     }
 
     [HttpPatch]
-    public IActionResult PatchList([FromBody] GameListDto listDto)
+    public async Task<IActionResult> PatchList([FromBody] GameListDto listDto)
     {
         if (listDto is null)
         {
             return BadRequest(ModelState);
         }
 
-        var list = gameListRepository.EditList(listDto.Adapt<GameList>());
+        var list = await gameListRepository.EditList(listDto.Adapt<GameList>());
         return Ok(list);
     }
 
+    [HttpPatch("editgameuser")]
+    public async Task<IActionResult> PatchGameUser([FromBody] GamesGameListDto listRelDto)
+    {
+        if (listRelDto is null)
+            return BadRequest(ModelState);
+
+        var list = await gamesGameListRepository.GetSingle(listRelDto.GameId, listRelDto.ListId);
+
+        if (list is null)
+            return NotFound();
+
+        list.User = await userRepository.GetById(listRelDto.UserId.ToString());
+
+        var updated = await gamesGameListRepository.Update(list);
+
+        return Ok(updated);
+    }
+
     [HttpPatch("removegame")]
-    public IActionResult RemoveGame([FromBody] GamePatch body)
+    public async Task<IActionResult> RemoveGame([FromBody] GamePatch body)
     {
         if (string.IsNullOrEmpty(body.ListId) || string.IsNullOrEmpty(body.GameId))
         {
             return BadRequest(ModelState);
         }
 
-        bool isAdded = gameListRepository.RemoveGame(body.ListId, Convert.ToInt32(body.GameId));
+        bool isAdded = await gameListRepository.RemoveGame(body.ListId, Convert.ToInt32(body.GameId));
 
         if (isAdded)
         {
@@ -110,7 +130,7 @@ public class GameListsController(IGameListRepository gameListRepository, IGameRe
     }
 
     [HttpPost]
-    public ActionResult Create([FromBody] GameListDto list)
+    public async Task<ActionResult> Create([FromBody] GameListDto list)
     {
         if (list is null)
             return BadRequest(ModelState);
@@ -119,7 +139,7 @@ public class GameListsController(IGameListRepository gameListRepository, IGameRe
         var adaptedList = list.Adapt<GameList>();
         adaptedList.CreatorId = new (currentUserId!);
 
-        var newList = gameListRepository.Add(adaptedList);
+        var newList = await gameListRepository.AddAsync(adaptedList);
 
         return Ok(newList.Adapt<GameListDto>());
     }

@@ -1,6 +1,7 @@
 ﻿using GProject.Application.Repository;
 using GProject.DataAccess;
 using GProject.Domain.Entities.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace GProject.Infrastructure.Repository;
 
@@ -8,20 +9,24 @@ public class UserRepository(ApplicationContext context) : IUserRepository
 {
     private readonly ApplicationContext _context = context;
 
-    public User? Add(User entity)
+    public async Task<User?> AddAsync(User entity)
     {
-        _context.Users.Add(entity);
-        _context.SaveChanges();
+        await _context.Users.AddAsync(entity);
+        await _context.SaveChangesAsync();
 
-        _context.Entry(entity).Reload();
+        await _context.Entry(entity).ReloadAsync();
         return entity;
     }
 
-    public User? GetByUsername(string username) => _context.Users.FirstOrDefault(x => x.Username == username);
+    public async Task<User?> GetByUsername(string username) =>
+        await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
 
-    public IEnumerable<User> GetAll() => [.. _context.Users];
+    public async Task<IEnumerable<User>> GetAllAsync() =>
+        await _context.Users.ToListAsync();
 
-    public User? GetById(string id) => _context.Users.FirstOrDefault(x => x.Id.ToString() == id);
+    public async Task<User?> GetById(string id) =>
+        await _context.Users.FirstOrDefaultAsync(x => x.Id.ToString() == id);
 
-    public IEnumerable<User>? GetByName(string name) => _context.Users.Where(x => x.Username == name);
+    public async Task<IEnumerable<User>?> GetByName(string name) =>
+        await _context.Users.Where(x => x.Username == name).ToListAsync();
 }

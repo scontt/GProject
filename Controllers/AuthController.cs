@@ -21,7 +21,7 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
         if (string.IsNullOrEmpty(authData.Username) || string.IsNullOrEmpty(authData.Password))
             return BadRequest(ModelState);
 
-        var existingUser = userRepository.GetByUsername(authData.Username);
+        var existingUser = await userRepository.GetByUsername(authData.Username);
         if (existingUser is not null)
             return Conflict();
 
@@ -36,7 +36,7 @@ public class AuthController(IUserRepository userRepository, IAuthService authSer
     [HttpPost("login")]
     public async Task<IActionResult> SignIn([FromBody] AuthData authData)
     {
-        var searchedUser = userRepository.GetByUsername(authData.Username);
+        var searchedUser = await userRepository.GetByUsername(authData.Username);
 
         if (searchedUser is null)
             return Unauthorized();

@@ -17,7 +17,7 @@ public class UserController(IUserRepository userRepository) : ControllerBase
         if (userId == null)
             return Unauthorized();
 
-        var user = userRepository.GetById(userId);
+        var user = await userRepository.GetById(userId);
 
         return Ok(user.Adapt<UserDto>());
     }

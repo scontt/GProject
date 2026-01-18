@@ -15,15 +15,15 @@ public class GameController(IGameRepository gameRepository) : ControllerBase
 
     [Authorize]
     [HttpGet("steam")]
-    public ActionResult GetAllFromSteam()
+    public async Task<ActionResult> GetAllFromSteam()
     {
-        return Ok(_gameRepository.GetAll());
+        return Ok(await _gameRepository.GetAllAsync());
     }
 
     [HttpGet("{id}")]
-    public ActionResult GetById(string id)
+    public async Task<ActionResult> GetById(string id)
     {
-        var game = _gameRepository.GetById(id);
+        var game = await _gameRepository.GetById(id);
 
         if (game == null)
             return NotFound();
@@ -32,9 +32,9 @@ public class GameController(IGameRepository gameRepository) : ControllerBase
     }
 
     [HttpGet("name/{name}")]
-    public ActionResult GetByName(string name)
+    public async Task<ActionResult> GetByName(string name)
     {
-        var game = _gameRepository.GetByName(name)?.ToList();
+        var game = (await _gameRepository.GetByName(name))?.ToList();
 
         if (game == null)
             return NotFound();
