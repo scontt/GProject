@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RollerFate.Application/RollerFate.Application.csproj" />
+    <Project Path="src/RollerFate.Domain/RollerFate.Domain.csproj" />
+    <Project Path="src/RollerFate.Infrastructure/RollerFate.Infrastructure.csproj" />
+    <Project Path="src/RollerFate.Presentation/RollerFate.Presentation.csproj" />
+  </Folder>
+</Solution>
