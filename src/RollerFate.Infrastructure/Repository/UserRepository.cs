@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RollerFate.Application.Repository;
+using RollerFate.Application.Abstractions.Repository;
 using RollerFate.Domain.Entities.Database;
 using RollerFate.Infrastructure.Persistence.DataAccess;
 

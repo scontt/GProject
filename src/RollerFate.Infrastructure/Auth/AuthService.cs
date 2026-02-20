@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using RollerFate.Application.Auth;
+using RollerFate.Application.Abstractions.Auth;
 using RollerFate.Domain.Dto;
 using RollerFate.Domain.Dto.Auth;
 using RollerFate.Domain.Entities.Auth;

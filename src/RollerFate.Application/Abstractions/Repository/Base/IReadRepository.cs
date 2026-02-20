@@ -1,4 +1,4 @@
-﻿namespace RollerFate.Application.Repository.Base;
+﻿namespace RollerFate.Application.Abstractions.Repository.Base;
 
 public interface IReadRepository<T>
 {

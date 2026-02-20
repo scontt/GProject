@@ -3,7 +3,7 @@ using RollerFate.Domain.Dto;
 using RollerFate.Domain.Dto.Auth;
 using RollerFate.Domain.Entities.Auth;
 
-namespace RollerFate.Application.Auth;
+namespace RollerFate.Application.Abstractions.Auth;
 
 public interface IAuthService
 {

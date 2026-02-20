@@ -1,6 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 
-namespace RollerFate.Application.Auth;
+namespace RollerFate.Application.Abstractions.Auth;
 
 public interface IJwtSigningService
 {

@@ -1,8 +1,8 @@
-﻿using RollerFate.Application.Repository;
-using RollerFate.Domain.Dto;
+﻿using RollerFate.Domain.Dto;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RollerFate.Application.Abstractions.Repository;
 
 namespace RollerFate.Presentation.Controllers;
 

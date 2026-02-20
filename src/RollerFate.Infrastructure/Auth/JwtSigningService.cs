@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using RollerFate.Application.Auth;
+using RollerFate.Application.Abstractions.Auth;
 
 namespace RollerFate.Infrastructure.Auth;
 

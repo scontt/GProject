@@ -1,6 +1,6 @@
 using RollerFate.Domain.Entities.Database;
 
-namespace RollerFate.Application.Repository;
+namespace RollerFate.Application.Abstractions.Repository;
 
 public interface IGamesGameListRepository
 {

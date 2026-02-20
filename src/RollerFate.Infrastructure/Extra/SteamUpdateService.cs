@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
-using RollerFate.Application.Repository;
+using RollerFate.Application.Abstractions.Repository;
 using RollerFate.Domain.Entities.Database;
 using RollerFate.Domain.Steam;
 

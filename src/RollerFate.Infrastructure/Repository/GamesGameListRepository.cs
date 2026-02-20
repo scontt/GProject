@@ -1,3 +1,4 @@
+using RollerFate.Application.Abstractions.Repository;
 using RollerFate.Application.Repository;
 using RollerFate.Domain.Entities.Database;
 using RollerFate.Infrastructure.Persistence.DataAccess;

@@ -1,10 +1,10 @@
 ﻿using System.Security.Claims;
-using RollerFate.Application.Repository;
 using RollerFate.Domain.Dto;
 using RollerFate.Domain.Entities.Database;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RollerFate.Application.Abstractions.Repository;
 
 namespace RollerFate.Presentation.Controllers;
 
@@ -19,7 +19,7 @@ public class GameListsController(IGameListRepository gameListRepository, IGamesG
     {
         var list = await gameListRepository.GetAllAsync();
 
-        if (list is null)
+        if (!list.Any())
             return NotFound();
 
         return Ok(list);
@@ -50,9 +50,9 @@ public class GameListsController(IGameListRepository gameListRepository, IGamesG
     [HttpGet("user/{userId}")]
     public async Task<IActionResult> GetByUserId(string userId)
     {
-        var list = await gameListRepository.GetByUserId(new(userId));
+        var list = await gameListRepository.GetByUserId(new Guid(userId));
 
-        if (list is null)
+        if (list.Count == 0)
             return NotFound();
 
         return Ok(list.Adapt<List<GameListDto>>());
@@ -81,7 +81,7 @@ public class GameListsController(IGameListRepository gameListRepository, IGamesG
     [HttpPatch]
     public async Task<IActionResult> PatchList([FromBody] GameListDto listDto)
     {
-        if (listDto is null)
+        if (listDto.Id == Guid.Empty)
         {
             return BadRequest(ModelState);
         }
@@ -93,7 +93,7 @@ public class GameListsController(IGameListRepository gameListRepository, IGamesG
     [HttpPatch("editgameuser")]
     public async Task<IActionResult> PatchGameUser([FromBody] GamesGameListDto listRelDto)
     {
-        if (listRelDto is null)
+        if (listRelDto.GameId == 0)
             return BadRequest(ModelState);
 
         var list = await gamesGameListRepository.GetSingle(listRelDto.GameId, listRelDto.ListId);
@@ -131,7 +131,7 @@ public class GameListsController(IGameListRepository gameListRepository, IGamesG
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] GameListDto list)
     {
-        if (list is null)
+        if (list.Id == Guid.Empty)
             return BadRequest(ModelState);
 
         var currentUserId = User.FindFirstValue("id");

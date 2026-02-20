@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using RollerFate.Application.Auth;
-using RollerFate.Application.Repository;
+using RollerFate.Application.Abstractions.Auth;
+using RollerFate.Application.Abstractions.Repository;
 using RollerFate.Domain.Dto.Auth;
 using RollerFate.Domain.Entities.Auth;
 

@@ -1,5 +1,5 @@
-﻿using RollerFate.Application.Auth;
-using RollerFate.Application.Repository;
+﻿using RollerFate.Application.Abstractions.Auth;
+using RollerFate.Application.Abstractions.Repository;
 using RollerFate.Infrastructure.Auth;
 using RollerFate.Infrastructure.Extra;
 using RollerFate.Infrastructure.Repository;

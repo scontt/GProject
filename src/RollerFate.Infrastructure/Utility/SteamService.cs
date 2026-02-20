@@ -1,7 +1,7 @@
 using RestSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RollerFate.Application.Repository;
+using RollerFate.Application.Abstractions.Repository;
 using RollerFate.Domain.Dto;
 
 namespace RollerFate.Infrastructure.Utility

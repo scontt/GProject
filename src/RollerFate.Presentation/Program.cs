@@ -1,4 +1,3 @@
-using RollerFate.Application.Auth;
 using RollerFate.Infrastructure.Auth;
 using RollerFate.Infrastructure.Persistence.DataAccess;
 using RollerFate.Infrastructure.Policies;
@@ -7,6 +6,7 @@ using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using RollerFate.Application.Abstractions.Auth;
 
 namespace RollerFate.Presentation;
 

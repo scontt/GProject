@@ -1,0 +1,31 @@
+﻿services:
+  rollerfate.application:
+    image: rollerfate.application
+    build:
+      context: .
+      dockerfile: src/RollerFate.Application/Dockerfile
+
+  rollerfate.domain:
+    image: rollerfate.domain
+    build:
+      context: .
+      dockerfile: src/RollerFate.Domain/Dockerfile
+
+  rollerfate.infrastructure:
+    image: rollerfate.infrastructure
+    build:
+      context: .
+      dockerfile: src/RollerFate.Infrastructure/Dockerfile
+
+  rollerfate.presentation:
+    image: rollerfate.presentation
+    build:
+      context: .
+      dockerfile: src/RollerFate.Presentation/Dockerfile
+
+  rollerfate.unittests:
+    image: rollerfate.unittests
+    build:
+      context: .
+      dockerfile: tests/RollerFate.UnitTests/Dockerfile
+
