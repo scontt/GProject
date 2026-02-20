@@ -5,4 +5,7 @@
     <Project Path="src/RollerFate.Infrastructure/RollerFate.Infrastructure.csproj" />
     <Project Path="src/RollerFate.Presentation/RollerFate.Presentation.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests\RollerFate.UnitTests\RollerFate.UnitTests.csproj" />
+  </Folder>
 </Solution>
